@@ -1,9 +1,11 @@
 project:
   type: website
   output-dir: docs
+  resources:
+    - images
 
 website:
-  title: "Your Name - Data Science Portfolio"
+  title: "Paul Probst"
   description: "A showcase of my data science projects and learning journey"
   
   navbar:
@@ -26,9 +28,9 @@ website:
             href: projects/final-project.qmd
     right:
       - icon: github
-        href: https://github.com/your-username
+        href: https://github.com/pmprobst
       - icon: linkedin
-        href: https://linkedin.com/in/your-profile
+        href: https://linkedin.com/in/paul-probst/
 
   sidebar:
     - title: "Projects"
