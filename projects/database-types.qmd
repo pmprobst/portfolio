@@ -38,7 +38,7 @@ Most database paradigms sit somewhere on this spectrum. Keep that tension in min
 
 ## Relational (OLTP) Databases
 
-**OLTP** stands for *Online Transaction Processing*. This is the classic relational database you learned about in your intro course — think PostgreSQL, MySQL, or SQLite.
+**OLTP** stands for *Online Transaction Processing*. This is the classic relational database you learned about in 100 level IS and STAT classes — think PostgreSQL, MySQL, or SQLite.
 
 OLTP databases are built around **normalization**, the process of eliminating redundancy by splitting data into many small, related tables. The standard target is *Third Normal Form (3NF)*, which ensures that every non-key column depends only on the primary key.
 
@@ -193,11 +193,7 @@ Database design is not about memorizing definitions — it is about understandin
 Here is what to do next:
 
 - **Sketch a schema** for a dataset you already work with. Which paradigm does it currently use? Which would be better?
-- **Spin up a free tier** of [Snowflake](https://www.snowflake.com/en/data-cloud/try-snowflake/) or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register) and load a small dataset using the pattern described above.
+- **Spin up a free tier** of [Snowflake](https://signup.snowflake.com/) or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register) and load a small dataset using the pattern described above.
 - **Read further** — the [Kimball Group's dimensional modeling resources](https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/) are the gold standard for star schema design and are freely available online.
 
 The best database is the one that matches your workload. Now you have the vocabulary to make that call deliberately.
-
----
-
-*Have a question or want to share what you built? Reach out via the contact page.*

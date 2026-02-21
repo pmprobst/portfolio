@@ -370,7 +370,7 @@ window.Quarto = {
 </section>
 <section id="relational-oltp-databases" class="level2">
 <h2 class="anchored" data-anchor-id="relational-oltp-databases">Relational (OLTP) Databases</h2>
-<p><strong>OLTP</strong> stands for <em>Online Transaction Processing</em>. This is the classic relational database you learned about in your intro course — think PostgreSQL, MySQL, or SQLite.</p>
+<p><strong>OLTP</strong> stands for <em>Online Transaction Processing</em>. This is the classic relational database you learned about in 100 level IS and STAT classes — think PostgreSQL, MySQL, or SQLite.</p>
 <p>OLTP databases are built around <strong>normalization</strong>, the process of eliminating redundancy by splitting data into many small, related tables. The standard target is <em>Third Normal Form (3NF)</em>, which ensures that every non-key column depends only on the primary key.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- A normalized OLTP schema</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> customers (</span>
@@ -532,12 +532,10 @@ dim_product — fact_sales — dim_customer
 <p>Here is what to do next:</p>
 <ul>
 <li><strong>Sketch a schema</strong> for a dataset you already work with. Which paradigm does it currently use? Which would be better?</li>
-<li><strong>Spin up a free tier</strong> of <a href="https://www.snowflake.com/en/data-cloud/try-snowflake/">Snowflake</a> or <a href="https://www.mongodb.com/cloud/atlas/register">MongoDB Atlas</a> and load a small dataset using the pattern described above.</li>
+<li><strong>Spin up a free tier</strong> of <a href="https://signup.snowflake.com/">Snowflake</a> or <a href="https://www.mongodb.com/cloud/atlas/register">MongoDB Atlas</a> and load a small dataset using the pattern described above.</li>
 <li><strong>Read further</strong> — the <a href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/">Kimball Group’s dimensional modeling resources</a> are the gold standard for star schema design and are freely available online.</li>
 </ul>
 <p>The best database is the one that matches your workload. Now you have the vocabulary to make that call deliberately.</p>
-<hr>
-<p><em>Have a question or want to share what you built? Reach out via the contact page.</em></p>
 
 
 <!-- -->
@@ -1037,7 +1035,7 @@ dim_product — fact_sales — dim_customer
 <span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Relational (OLTP) Databases</span></span>
 <span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>**OLTP** stands for *Online Transaction Processing*. This is the classic relational database you learned about in your intro course — think PostgreSQL, MySQL, or SQLite.</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>**OLTP** stands for *Online Transaction Processing*. This is the classic relational database you learned about in 100 level IS and STAT classes — think PostgreSQL, MySQL, or SQLite.</span>
 <span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>OLTP databases are built around **normalization**, the process of eliminating redundancy by splitting data into many small, related tables. The standard target is *Third Normal Form (3NF)*, which ensures that every non-key column depends only on the primary key.</span>
 <span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
@@ -1192,14 +1190,10 @@ dim_product — fact_sales — dim_customer
 <span id="cb5-193"><a href="#cb5-193" aria-hidden="true" tabindex="-1"></a>Here is what to do next:</span>
 <span id="cb5-194"><a href="#cb5-194" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-195"><a href="#cb5-195" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sketch a schema** for a dataset you already work with. Which paradigm does it currently use? Which would be better?</span>
-<span id="cb5-196"><a href="#cb5-196" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Spin up a free tier** of <span class="co">[</span><span class="ot">Snowflake</span><span class="co">](https://www.snowflake.com/en/data-cloud/try-snowflake/)</span> or <span class="co">[</span><span class="ot">MongoDB Atlas</span><span class="co">](https://www.mongodb.com/cloud/atlas/register)</span> and load a small dataset using the pattern described above.</span>
+<span id="cb5-196"><a href="#cb5-196" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Spin up a free tier** of <span class="co">[</span><span class="ot">Snowflake</span><span class="co">](https://signup.snowflake.com/)</span> or <span class="co">[</span><span class="ot">MongoDB Atlas</span><span class="co">](https://www.mongodb.com/cloud/atlas/register)</span> and load a small dataset using the pattern described above.</span>
 <span id="cb5-197"><a href="#cb5-197" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Read further** — the <span class="co">[</span><span class="ot">Kimball Group's dimensional modeling resources</span><span class="co">](https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/)</span> are the gold standard for star schema design and are freely available online.</span>
 <span id="cb5-198"><a href="#cb5-198" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-199"><a href="#cb5-199" aria-hidden="true" tabindex="-1"></a>The best database is the one that matches your workload. Now you have the vocabulary to make that call deliberately.</span>
-<span id="cb5-200"><a href="#cb5-200" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-201"><a href="#cb5-201" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb5-202"><a href="#cb5-202" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-203"><a href="#cb5-203" aria-hidden="true" tabindex="-1"></a>*Have a question or want to share what you built? Reach out via the contact page.*</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb5-199"><a href="#cb5-199" aria-hidden="true" tabindex="-1"></a>The best database is the one that matches your workload. Now you have the vocabulary to make that call deliberately.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
