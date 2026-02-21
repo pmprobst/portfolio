@@ -11,42 +11,42 @@
     "href": "about.html#introduction",
     "title": "About Me",
     "section": "Introduction",
-    "text": "Introduction\nWrite a short professional introduction here. Share your major, year, and academic or professional interests. Keep the tone professional but approachable—this is your chance to make a strong first impression."
+    "text": "Introduction\nI’m Paul Probst, a data science student at Brigham Young University (BYU) with a minor in Business, graduating in April 2027. I’m interested in applying machine learning and data engineering to real-world problems—from property risk and supply chain optimization to research in oncology and survey analysis. I aim to be both rigorous and collaborative in how I work with data and teams."
   },
   {
     "objectID": "about.html#education",
     "href": "about.html#education",
     "title": "About Me",
     "section": "Education",
-    "text": "Education\n\n[School Name] — [Degree program], [expected graduation date if applicable]\n[Other school if applicable] — [Degree or program], [dates]"
+    "text": "Education\n\nBrigham Young University, Provo, UT — B.S. Data Science, Minor: Business (expected April 2027), GPA 3.4"
   },
   {
     "objectID": "about.html#experience",
     "href": "about.html#experience",
     "title": "About Me",
     "section": "Experience",
-    "text": "Experience\nInclude relevant experiences with a brief description for each:\n\nJob or role title — [Employer or context]. Brief description of responsibilities and what you learned or accomplished.\nInternship — [Organization]. What you did and key takeaways.\nResearch — [Project or lab]. Your role and focus.\nMajor project — [Project name]. What it was and your contribution.\nVolunteer work — [Organization or cause]. Your role and impact.\n\nReplace the items above with your own; remove any category that doesn’t apply."
+    "text": "Experience\n\nData Analyst, BYU Research & Reporting, Provo, UT (August 2023 – Present)\nDesigned custom R analyses for university data to identify patterns in enrollment across 35,000+ students. Built reusable SQL data marts adopted by 500+ users. Developed Tableau dashboards and tabular reports with row-level security for executives, public media, and accreditation. Supported team ML projects with data engineering, schema documentation, and visualization.\nData Science Intern, FM Global Research & Development, Providence, RI (April 2024 – November 2024)\nTrained and validated supervised ML models to quantify natural disaster property risk and estimate replacement cost, improving predictive accuracy by over 60%. Integrated software providers and data vendors into a cohesive data science workflow. Built end-to-end Python data engineering pipelines for multi-source tabular and imagery metadata. Productionized features at scale for 3k+ properties/day and led model QA: challenger–champion comparisons, cross-validation, and error analysis.\nOperations Data Analyst, Modern Energy, Worcester, MA (April 2024 – August 2024)\nImplemented and maintained inventory management software, optimizing database performance by 40%. Conducted supply chain optimization and demand forecasting to reduce costs. Used data to identify trends and inefficiencies in order fulfillment. Maintained real-time supply chain data and predictive analytics, improving turnaround times by 3 weeks.\nResearch Assistant, Huntsman Cancer Institute, Salt Lake City, UT (August 2024 – Present)\nAnalyzed experimental oncology datasets using Bayesian modeling and regression in Python to estimate treatment–response curves and identify optimal dosage levels. Structured raw lab data from dose-escalation experiments for reproducibility. Developed visualizations and summary reports to translate statistical findings into actionable insights.\nResearch Assistant, Secondary Schools Writing Center Association, Washington D.C. (November 2024 – Present)\nDesigned survey instruments, sampling frames, and contact workflows to maximize response rate. Built and maintained clean datasets from 300+ survey returns to support ongoing analysis."
   },
   {
     "objectID": "about.html#skills",
     "href": "about.html#skills",
     "title": "About Me",
     "section": "Skills",
-    "text": "Skills\nA scannable list of relevant skills:\n\nProgramming languages: e.g., Python, R, SQL, JavaScript\nTools and technologies: e.g., Git/GitHub, Jupyter, Pandas, Tableau\nTechnical skills: e.g., data analysis, visualization, statistical modeling\nSoft skills: e.g., communication, teamwork, problem-solving"
+    "text": "Skills\n\nProgramming languages: Python, R, SQL, C++\nTools and technologies: Tableau, Databricks, Azure, GIS, Microsoft Excel\nTechnical skills: Machine learning, data engineering, data visualization, Bayesian modeling, predictive analytics\nSoft skills: Project management, writing and communication"
   },
   {
     "objectID": "about.html#get-to-know-me",
     "href": "about.html#get-to-know-me",
     "title": "About Me",
     "section": "Get to Know Me",
-    "text": "Get to Know Me\nThis section adds personality beyond your résumé. You might include:\n\nHobbies: e.g., hiking, photography, reading, gaming\nInterests: e.g., sustainability, music, travel\nFun facts: e.g., languages you speak, places you’ve lived, something unexpected about you"
+    "text": "Get to Know Me\n\nHobbies: Hiking, backpacking, mountain biking\nInterests: Botany, GIS, cartography\nFun facts: I’ve been fishing for sharks"
   },
   {
     "objectID": "about.html#contact",
     "href": "about.html#contact",
     "title": "About Me",
     "section": "Contact",
-    "text": "Contact\n\nEmail: your.email@example.com\nGitHub: github.com/your-username\nLinkedIn: linkedin.com/in/your-profile"
+    "text": "Contact\n\nEmail: pmprobst@byu.edu\nGitHub: github.com/pmprobst\nLinkedIn: linkedin.com/in/paul-probst"
   },
   {
     "objectID": "projects/index.html",
