@@ -10,8 +10,6 @@ format:
 
 # Choosing the Right Database for the Job: A Practical Guide for Data Students
 
-*Published · Stat 386 Portfolio · ~5 min read*
-
 ---
 
 ## Introduction: Why Does Database Design Matter?

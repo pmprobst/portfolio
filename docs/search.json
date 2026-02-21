@@ -49,162 +49,14 @@
     "text": "Contact\n\nEmail: pmprobst@byu.edu\nGitHub: github.com/pmprobst\nLinkedIn: linkedin.com/in/paul-probst"
   },
   {
-    "objectID": "tutorial-database-types.html",
-    "href": "tutorial-database-types.html",
-    "title": "",
-    "section": "",
-    "text": "Code"
-  },
-  {
-    "objectID": "tutorial-database-types.html#introduction-why-does-database-design-matter",
-    "href": "tutorial-database-types.html#introduction-why-does-database-design-matter",
-    "title": "",
-    "section": "Introduction: Why Does Database Design Matter?",
-    "text": "Introduction: Why Does Database Design Matter?\nYou have learned how to write a SELECT statement and maybe even joined a few tables together. But have you ever wondered why some databases look the way they do — or why your professor’s example table looks nothing like the database schema at your internship?\nThe answer is that there is no single “correct” way to store data. The structure you choose depends on what you plan to do with the data: record transactions, run analytics, store unstructured content, or serve a machine-learning pipeline. Picking the wrong structure means slower queries, higher costs, and a lot of frustrated engineers.\nThis post walks you through the most common database paradigms you will encounter as a data student, explains the tradeoffs in plain language, and gives you a mental model for deciding which one fits a given problem."
-  },
-  {
-    "objectID": "tutorial-database-types.html#the-core-tension-writes-vs.-reads",
-    "href": "tutorial-database-types.html#the-core-tension-writes-vs.-reads",
-    "title": "",
-    "section": "The Core Tension: Writes vs. Reads",
-    "text": "The Core Tension: Writes vs. Reads\nBefore diving into specific designs, it helps to understand the fundamental tradeoff that drives almost every database decision.\n\n\n\n\n\n\n\n\nGoal\nOptimized for\nTypical user\n\n\n\n\nRecording transactions fast\nWrites (inserts/updates)\nWeb app, point-of-sale system\n\n\nAnswering analytical questions fast\nReads (aggregations, scans)\nData analyst, BI dashboard\n\n\nStoring raw, heterogeneous data cheaply\nVolume and flexibility\nData engineer, ML pipeline\n\n\n\nMost database paradigms sit somewhere on this spectrum. Keep that tension in mind as you read through each type below."
-  },
-  {
-    "objectID": "tutorial-database-types.html#relational-oltp-databases",
-    "href": "tutorial-database-types.html#relational-oltp-databases",
-    "title": "",
-    "section": "Relational (OLTP) Databases",
-    "text": "Relational (OLTP) Databases\nOLTP stands for Online Transaction Processing. This is the classic relational database you learned about in your intro course — think PostgreSQL, MySQL, or SQLite.\nOLTP databases are built around normalization, the process of eliminating redundancy by splitting data into many small, related tables. The standard target is Third Normal Form (3NF), which ensures that every non-key column depends only on the primary key.\n-- A normalized OLTP schema\nCREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    name        TEXT,\n    email       TEXT UNIQUE\n);\n\nCREATE TABLE orders (\n    order_id    INT PRIMARY KEY,\n    customer_id INT REFERENCES customers(customer_id),\n    order_date  DATE,\n    total       NUMERIC(10, 2)\n);\nWhen to use it: Anytime you need to guarantee data integrity for individual transactions — an e-commerce checkout, a hospital patient record, a banking ledger. ACID compliance (Atomicity, Consistency, Isolation, Durability) ensures that a payment either fully succeeds or fully fails; there is no in-between.\nThe downside: Joining 10+ normalized tables to answer “What was our revenue by region last quarter?” is slow and painful. That pain is what motivated the next two paradigms."
-  },
-  {
-    "objectID": "tutorial-database-types.html#star-schema-fact-and-dimension-tables",
-    "href": "tutorial-database-types.html#star-schema-fact-and-dimension-tables",
-    "title": "",
-    "section": "Star Schema: Fact and Dimension Tables",
-    "text": "Star Schema: Fact and Dimension Tables\nWhen a team needs to run analytical queries on large volumes of historical data, they often move that data into a separate data warehouse structured as a star schema.\nA star schema splits data into two kinds of tables:\n\nFact tables — store numeric measurements of business events (sales amount, click counts, page views). They are wide, tall, and append-only.\nDimension tables — store descriptive context (product name, customer region, date attributes). They are smaller and updated less frequently.\n\nThe schema gets its name because an entity-relationship diagram looks like a star, with the fact table at the center and dimension tables radiating outward.\n         dim_date\n            |\ndim_product — fact_sales — dim_customer\n            |\n        dim_store\nThe math behind aggregations becomes straightforward:\n\\[\\text{Revenue} = \\sum_{i} \\text{quantity}_i \\times \\text{unit\\_price}_i\\]\n-- Typical star schema analytical query\nSELECT\n    d.month,\n    c.region,\n    SUM(f.quantity * f.unit_price) AS revenue\nFROM fact_sales f\nJOIN dim_date     d ON f.date_id     = d.date_id\nJOIN dim_customer c ON f.customer_id = c.customer_id\nGROUP BY d.month, c.region\nORDER BY d.month;\nWhen to use it: BI dashboards, executive reporting, any scenario where analysts need fast aggregations over millions of rows. Tools like Snowflake, BigQuery, and Redshift are purpose-built for this pattern."
-  },
-  {
-    "objectID": "tutorial-database-types.html#nosql-databases-three-flavors",
-    "href": "tutorial-database-types.html#nosql-databases-three-flavors",
-    "title": "",
-    "section": "NoSQL Databases: Three Flavors",
-    "text": "NoSQL Databases: Three Flavors\nSometimes your data does not fit neatly into rows and columns. NoSQL databases trade rigid schema and ACID guarantees for flexibility and horizontal scalability. There are three main types worth knowing.\n\nDocument Stores\nDocument databases (e.g., MongoDB, Firestore) store data as self-contained JSON-like documents. Each document can have a different structure, making them ideal for heterogeneous data.\n{\n  \"user_id\": \"u_8821\",\n  \"name\": \"Jordan Lee\",\n  \"preferences\": {\n    \"theme\": \"dark\",\n    \"notifications\": [\"email\", \"sms\"]\n  },\n  \"orders\": [\n    { \"order_id\": \"o_001\", \"total\": 49.99 },\n    { \"order_id\": \"o_002\", \"total\": 120.00 }\n  ]\n}\nThis is the “just nest it” approach — great for user profiles, product catalogs, and CMS content.\n\n\nKey-Value Stores\nKey-value databases (e.g., Redis, DynamoDB) are the simplest possible structure: a dictionary at massive scale. They are extremely fast for lookups by a single key.\nBest for: session tokens, caching, leaderboards, real-time counters.\n\n\nGraph Databases\nGraph databases (e.g., Neo4j) model data as nodes (entities) and edges (relationships). When the connections between things matter more than the things themselves, graphs win.\nBest for: social networks, fraud detection, recommendation engines, knowledge graphs."
-  },
-  {
-    "objectID": "tutorial-database-types.html#data-lakes-raw-data-at-rest",
-    "href": "tutorial-database-types.html#data-lakes-raw-data-at-rest",
-    "title": "",
-    "section": "Data Lakes: Raw Data at Rest",
-    "text": "Data Lakes: Raw Data at Rest\nA data lake is a centralized repository — often on cloud object storage like Amazon S3 or Azure Data Lake — where you dump raw data in its original format: CSV files, JSON logs, images, Parquet files, database exports. Nothing is transformed before it lands.\nThe key insight is schema-on-read: you do not impose a structure when writing data, only when querying it. This makes ingestion cheap and fast, but querying requires more upfront work.\nData lakes are foundational to modern ML pipelines because they preserve the raw signal. You can always re-process raw data with a better model; you cannot un-aggregate data that was summarized on the way in."
-  },
-  {
-    "objectID": "tutorial-database-types.html#one-big-table-obt",
-    "href": "tutorial-database-types.html#one-big-table-obt",
-    "title": "",
-    "section": "One Big Table (OBT)",
-    "text": "One Big Table (OBT)\nThe One Big Table pattern is exactly what it sounds like: denormalize everything into a single, flat, wide table. Every dimension value is pre-joined so that analysts never need to write a JOIN.\n\n\n\n\n\n\n\n\n\n\n\n\n\norder_id\ncustomer_name\ncustomer_region\nproduct_name\ncategory\norder_date\nquantity\nunit_price\n\n\n\n\no_001\nJordan Lee\nWest\nWidget Pro\nHardware\n2024-03-01\n2\n24.99\n\n\no_002\nSam Rivera\nEast\nGadget Plus\nSoftware\n2024-03-02\n1\n99.00\n\n\n\nPros: dead-simple queries, no JOINs, easy for non-technical stakeholders.\nCons: massive storage footprint, duplicated data, painful to update (changing a product’s category means touching thousands of rows).\nOBT works best as a downstream export — something generated from a star schema for a specific use case — rather than a source of truth."
-  },
-  {
-    "objectID": "tutorial-database-types.html#choosing-the-right-tool-a-quick-decision-guide",
-    "href": "tutorial-database-types.html#choosing-the-right-tool-a-quick-decision-guide",
-    "title": "",
-    "section": "Choosing the Right Tool: A Quick Decision Guide",
-    "text": "Choosing the Right Tool: A Quick Decision Guide\nWork through these questions in order:\n\nDo you need transaction integrity? → OLTP relational database.\nDo you need fast analytical aggregations on historical data? → Star schema / data warehouse.\nIs your data unstructured or variable-schema? → Document store (NoSQL).\nDo you need sub-millisecond lookups by a single key? → Key-value store.\nAre relationships between entities the primary concern? → Graph database.\nDo you need to store raw data cheaply at scale for future processing? → Data lake.\nDo you need a simple, flat export for a dashboard or downstream consumer? → OBT.\n\nReal architectures often combine several of these. A common pattern is: OLTP → raw events to a data lake → transformed into a star schema warehouse → a specific OBT exported for a dashboard."
-  },
-  {
-    "objectID": "tutorial-database-types.html#conclusion-and-call-to-action",
-    "href": "tutorial-database-types.html#conclusion-and-call-to-action",
-    "title": "",
-    "section": "Conclusion and Call to Action",
-    "text": "Conclusion and Call to Action\nDatabase design is not about memorizing definitions — it is about understanding tradeoffs. Every paradigm discussed here exists because some team hit a real limitation with the previous approach and needed a better fit for their specific workload.\nHere is what to do next:\n\nSketch a schema for a dataset you already work with. Which paradigm does it currently use? Which would be better?\nSpin up a free tier of Snowflake or MongoDB Atlas and load a small dataset using the pattern described above.\nRead further — the Kimball Group’s dimensional modeling resources are the gold standard for star schema design and are freely available online.\n\nThe best database is the one that matches your workload. Now you have the vocabulary to make that call deliberately.\n\nHave a question or want to share what you built? Reach out via the contact page."
-  },
-  {
-    "objectID": "projects/index.html",
-    "href": "projects/index.html",
-    "title": "Projects Overview",
-    "section": "",
-    "text": "Description: An overview of database types and when to use them.\n\n\n\nDescription: Pick a dataset and explore it to discover insights and answer questions.\n\n\n\nDescription: Find an interesting data source, collect the data, and prepare it for analysis.\n\n\n\nDescription: A comprehensive project that shows off my data science skills.",
-    "crumbs": [
-      "Projects Overview"
-    ]
-  },
-  {
-    "objectID": "projects/index.html#all-projects",
-    "href": "projects/index.html#all-projects",
-    "title": "Projects Overview",
-    "section": "",
-    "text": "Description: An overview of database types and when to use them.\n\n\n\nDescription: Pick a dataset and explore it to discover insights and answer questions.\n\n\n\nDescription: Find an interesting data source, collect the data, and prepare it for analysis.\n\n\n\nDescription: A comprehensive project that shows off my data science skills.",
-    "crumbs": [
-      "Projects Overview"
-    ]
-  },
-  {
-    "objectID": "projects/eda.html",
-    "href": "projects/eda.html",
-    "title": "EDA Project",
-    "section": "",
-    "text": "This is coming down the pipeline. Check again later.",
-    "crumbs": [
-      "EDA Project"
-    ]
-  },
-  {
-    "objectID": "projects/data-acquisition.html",
-    "href": "projects/data-acquisition.html",
-    "title": "Data Acquisition Project",
-    "section": "",
-    "text": "This is coming down the pipeline. Check again later.",
-    "crumbs": [
-      "Data Acquisition Project"
-    ]
-  },
-  {
-    "objectID": "projects/final-project.html",
-    "href": "projects/final-project.html",
-    "title": "Final Project",
-    "section": "",
-    "text": "This is coming down the pipeline. Check again later.",
-    "crumbs": [
-      "Final Project"
-    ]
-  },
-  {
     "objectID": "projects/database-types.html",
     "href": "projects/database-types.html",
     "title": "Tutorial: Database Types",
     "section": "",
-    "text": "Published · Stat 386 Portfolio · ~5 min read\n\n\n\nYou have learned how to write a SELECT statement and maybe even joined a few tables together. But have you ever wondered why some databases look the way they do — or why your professor’s example table looks nothing like the database schema at your internship?\nThe answer is that there is no single “correct” way to store data. The structure you choose depends on what you plan to do with the data: record transactions, run analytics, store unstructured content, or serve a machine-learning pipeline. Picking the wrong structure means slower queries, higher costs, and a lot of frustrated engineers.\nThis post walks you through the most common database paradigms you will encounter as a data student, explains the tradeoffs in plain language, and gives you a mental model for deciding which one fits a given problem.\n\n\n\n\nBefore diving into specific designs, it helps to understand the fundamental tradeoff that drives almost every database decision.\n\n\n\n\n\n\n\n\nGoal\nOptimized for\nTypical user\n\n\n\n\nRecording transactions fast\nWrites (inserts/updates)\nWeb app, point-of-sale system\n\n\nAnswering analytical questions fast\nReads (aggregations, scans)\nData analyst, BI dashboard\n\n\nStoring raw, heterogeneous data cheaply\nVolume and flexibility\nData engineer, ML pipeline\n\n\n\nMost database paradigms sit somewhere on this spectrum. Keep that tension in mind as you read through each type below.\n\n\n\n\nOLTP stands for Online Transaction Processing. This is the classic relational database you learned about in your intro course — think PostgreSQL, MySQL, or SQLite.\nOLTP databases are built around normalization, the process of eliminating redundancy by splitting data into many small, related tables. The standard target is Third Normal Form (3NF), which ensures that every non-key column depends only on the primary key.\n-- A normalized OLTP schema\nCREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    name        TEXT,\n    email       TEXT UNIQUE\n);\n\nCREATE TABLE orders (\n    order_id    INT PRIMARY KEY,\n    customer_id INT REFERENCES customers(customer_id),\n    order_date  DATE,\n    total       NUMERIC(10, 2)\n);\nWhen to use it: Anytime you need to guarantee data integrity for individual transactions — an e-commerce checkout, a hospital patient record, a banking ledger. ACID compliance (Atomicity, Consistency, Isolation, Durability) ensures that a payment either fully succeeds or fully fails; there is no in-between.\nThe downside: Joining 10+ normalized tables to answer “What was our revenue by region last quarter?” is slow and painful. That pain is what motivated the next two paradigms.\n\n\n\n\nWhen a team needs to run analytical queries on large volumes of historical data, they often move that data into a separate data warehouse structured as a star schema.\nA star schema splits data into two kinds of tables:\n\nFact tables — store numeric measurements of business events (sales amount, click counts, page views). They are wide, tall, and append-only.\nDimension tables — store descriptive context (product name, customer region, date attributes). They are smaller and updated less frequently.\n\nThe schema gets its name because an entity-relationship diagram looks like a star, with the fact table at the center and dimension tables radiating outward.\n         dim_date\n            |\ndim_product — fact_sales — dim_customer\n            |\n        dim_store\nThe math behind aggregations becomes straightforward:\n\\[\\text{Revenue} = \\sum_{i} \\text{quantity}_i \\times \\text{unit\\_price}_i\\]\n-- Typical star schema analytical query\nSELECT\n    d.month,\n    c.region,\n    SUM(f.quantity * f.unit_price) AS revenue\nFROM fact_sales f\nJOIN dim_date     d ON f.date_id     = d.date_id\nJOIN dim_customer c ON f.customer_id = c.customer_id\nGROUP BY d.month, c.region\nORDER BY d.month;\nWhen to use it: BI dashboards, executive reporting, any scenario where analysts need fast aggregations over millions of rows. Tools like Snowflake, BigQuery, and Redshift are purpose-built for this pattern.\n\n\n\n\nSometimes your data does not fit neatly into rows and columns. NoSQL databases trade rigid schema and ACID guarantees for flexibility and horizontal scalability. There are three main types worth knowing.\n\n\nDocument databases (e.g., MongoDB, Firestore) store data as self-contained JSON-like documents. Each document can have a different structure, making them ideal for heterogeneous data.\n{\n  \"user_id\": \"u_8821\",\n  \"name\": \"Jordan Lee\",\n  \"preferences\": {\n    \"theme\": \"dark\",\n    \"notifications\": [\"email\", \"sms\"]\n  },\n  \"orders\": [\n    { \"order_id\": \"o_001\", \"total\": 49.99 },\n    { \"order_id\": \"o_002\", \"total\": 120.00 }\n  ]\n}\nThis is the “just nest it” approach — great for user profiles, product catalogs, and CMS content.\n\n\n\nKey-value databases (e.g., Redis, DynamoDB) are the simplest possible structure: a dictionary at massive scale. They are extremely fast for lookups by a single key.\nBest for: session tokens, caching, leaderboards, real-time counters.\n\n\n\nGraph databases (e.g., Neo4j) model data as nodes (entities) and edges (relationships). When the connections between things matter more than the things themselves, graphs win.\nBest for: social networks, fraud detection, recommendation engines, knowledge graphs.\n\n\n\n\n\nA data lake is a centralized repository — often on cloud object storage like Amazon S3 or Azure Data Lake — where you dump raw data in its original format: CSV files, JSON logs, images, Parquet files, database exports. Nothing is transformed before it lands.\nThe key insight is schema-on-read: you do not impose a structure when writing data, only when querying it. This makes ingestion cheap and fast, but querying requires more upfront work.\nData lakes are foundational to modern ML pipelines because they preserve the raw signal. You can always re-process raw data with a better model; you cannot un-aggregate data that was summarized on the way in.\n\n\n\n\nThe One Big Table pattern is exactly what it sounds like: denormalize everything into a single, flat, wide table. Every dimension value is pre-joined so that analysts never need to write a JOIN.\n\n\n\n\n\n\n\n\n\n\n\n\n\norder_id\ncustomer_name\ncustomer_region\nproduct_name\ncategory\norder_date\nquantity\nunit_price\n\n\n\n\no_001\nJordan Lee\nWest\nWidget Pro\nHardware\n2024-03-01\n2\n24.99\n\n\no_002\nSam Rivera\nEast\nGadget Plus\nSoftware\n2024-03-02\n1\n99.00\n\n\n\nPros: dead-simple queries, no JOINs, easy for non-technical stakeholders.\nCons: massive storage footprint, duplicated data, painful to update (changing a product’s category means touching thousands of rows).\nOBT works best as a downstream export — something generated from a star schema for a specific use case — rather than a source of truth.\n\n\n\n\nWork through these questions in order:\n\nDo you need transaction integrity? → OLTP relational database.\nDo you need fast analytical aggregations on historical data? → Star schema / data warehouse.\nIs your data unstructured or variable-schema? → Document store (NoSQL).\nDo you need sub-millisecond lookups by a single key? → Key-value store.\nAre relationships between entities the primary concern? → Graph database.\nDo you need to store raw data cheaply at scale for future processing? → Data lake.\nDo you need a simple, flat export for a dashboard or downstream consumer? → OBT.\n\nReal architectures often combine several of these. A common pattern is: OLTP → raw events to a data lake → transformed into a star schema warehouse → a specific OBT exported for a dashboard.\n\n\n\n\nDatabase design is not about memorizing definitions — it is about understanding tradeoffs. Every paradigm discussed here exists because some team hit a real limitation with the previous approach and needed a better fit for their specific workload.\nHere is what to do next:\n\nSketch a schema for a dataset you already work with. Which paradigm does it currently use? Which would be better?\nSpin up a free tier of Snowflake or MongoDB Atlas and load a small dataset using the pattern described above.\nRead further — the Kimball Group’s dimensional modeling resources are the gold standard for star schema design and are freely available online.\n\nThe best database is the one that matches your workload. Now you have the vocabulary to make that call deliberately.\n\nHave a question or want to share what you built? Reach out via the contact page.",
+    "text": "You have learned how to write a SELECT statement and maybe even joined a few tables together. But have you ever wondered why some databases look the way they do — or why your professor’s example table looks nothing like the database schema at your internship?\nThe answer is that there is no single “correct” way to store data. The structure you choose depends on what you plan to do with the data: record transactions, run analytics, store unstructured content, or serve a machine-learning pipeline. Picking the wrong structure means slower queries, higher costs, and a lot of frustrated engineers.\nThis post walks you through the most common database paradigms you will encounter as a data student, explains the tradeoffs in plain language, and gives you a mental model for deciding which one fits a given problem.\n\n\n\n\nBefore diving into specific designs, it helps to understand the fundamental tradeoff that drives almost every database decision.\n\n\n\n\n\n\n\n\nGoal\nOptimized for\nTypical user\n\n\n\n\nRecording transactions fast\nWrites (inserts/updates)\nWeb app, point-of-sale system\n\n\nAnswering analytical questions fast\nReads (aggregations, scans)\nData analyst, BI dashboard\n\n\nStoring raw, heterogeneous data cheaply\nVolume and flexibility\nData engineer, ML pipeline\n\n\n\nMost database paradigms sit somewhere on this spectrum. Keep that tension in mind as you read through each type below.\n\n\n\n\nOLTP stands for Online Transaction Processing. This is the classic relational database you learned about in your intro course — think PostgreSQL, MySQL, or SQLite.\nOLTP databases are built around normalization, the process of eliminating redundancy by splitting data into many small, related tables. The standard target is Third Normal Form (3NF), which ensures that every non-key column depends only on the primary key.\n-- A normalized OLTP schema\nCREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    name        TEXT,\n    email       TEXT UNIQUE\n);\n\nCREATE TABLE orders (\n    order_id    INT PRIMARY KEY,\n    customer_id INT REFERENCES customers(customer_id),\n    order_date  DATE,\n    total       NUMERIC(10, 2)\n);\nWhen to use it: Anytime you need to guarantee data integrity for individual transactions — an e-commerce checkout, a hospital patient record, a banking ledger. ACID compliance (Atomicity, Consistency, Isolation, Durability) ensures that a payment either fully succeeds or fully fails; there is no in-between.\nThe downside: Joining 10+ normalized tables to answer “What was our revenue by region last quarter?” is slow and painful. That pain is what motivated the next two paradigms.\n\n\n\n\nWhen a team needs to run analytical queries on large volumes of historical data, they often move that data into a separate data warehouse structured as a star schema.\nA star schema splits data into two kinds of tables:\n\nFact tables — store numeric measurements of business events (sales amount, click counts, page views). They are wide, tall, and append-only.\nDimension tables — store descriptive context (product name, customer region, date attributes). They are smaller and updated less frequently.\n\nThe schema gets its name because an entity-relationship diagram looks like a star, with the fact table at the center and dimension tables radiating outward.\n         dim_date\n            |\ndim_product — fact_sales — dim_customer\n            |\n        dim_store\nThe math behind aggregations becomes straightforward:\n\\[\\text{Revenue} = \\sum_{i} \\text{quantity}_i \\times \\text{unit\\_price}_i\\]\n-- Typical star schema analytical query\nSELECT\n    d.month,\n    c.region,\n    SUM(f.quantity * f.unit_price) AS revenue\nFROM fact_sales f\nJOIN dim_date     d ON f.date_id     = d.date_id\nJOIN dim_customer c ON f.customer_id = c.customer_id\nGROUP BY d.month, c.region\nORDER BY d.month;\nWhen to use it: BI dashboards, executive reporting, any scenario where analysts need fast aggregations over millions of rows. Tools like Snowflake, BigQuery, and Redshift are purpose-built for this pattern.\n\n\n\n\nSometimes your data does not fit neatly into rows and columns. NoSQL databases trade rigid schema and ACID guarantees for flexibility and horizontal scalability. There are three main types worth knowing.\n\n\nDocument databases (e.g., MongoDB, Firestore) store data as self-contained JSON-like documents. Each document can have a different structure, making them ideal for heterogeneous data.\n{\n  \"user_id\": \"u_8821\",\n  \"name\": \"Jordan Lee\",\n  \"preferences\": {\n    \"theme\": \"dark\",\n    \"notifications\": [\"email\", \"sms\"]\n  },\n  \"orders\": [\n    { \"order_id\": \"o_001\", \"total\": 49.99 },\n    { \"order_id\": \"o_002\", \"total\": 120.00 }\n  ]\n}\nThis is the “just nest it” approach — great for user profiles, product catalogs, and CMS content.\n\n\n\nKey-value databases (e.g., Redis, DynamoDB) are the simplest possible structure: a dictionary at massive scale. They are extremely fast for lookups by a single key.\nBest for: session tokens, caching, leaderboards, real-time counters.\n\n\n\nGraph databases (e.g., Neo4j) model data as nodes (entities) and edges (relationships). When the connections between things matter more than the things themselves, graphs win.\nBest for: social networks, fraud detection, recommendation engines, knowledge graphs.\n\n\n\n\n\nA data lake is a centralized repository — often on cloud object storage like Amazon S3 or Azure Data Lake — where you dump raw data in its original format: CSV files, JSON logs, images, Parquet files, database exports. Nothing is transformed before it lands.\nThe key insight is schema-on-read: you do not impose a structure when writing data, only when querying it. This makes ingestion cheap and fast, but querying requires more upfront work.\nData lakes are foundational to modern ML pipelines because they preserve the raw signal. You can always re-process raw data with a better model; you cannot un-aggregate data that was summarized on the way in.\n\n\n\n\nThe One Big Table pattern is exactly what it sounds like: denormalize everything into a single, flat, wide table. Every dimension value is pre-joined so that analysts never need to write a JOIN.\n\n\n\n\n\n\n\n\n\n\n\n\n\norder_id\ncustomer_name\ncustomer_region\nproduct_name\ncategory\norder_date\nquantity\nunit_price\n\n\n\n\no_001\nJordan Lee\nWest\nWidget Pro\nHardware\n2024-03-01\n2\n24.99\n\n\no_002\nSam Rivera\nEast\nGadget Plus\nSoftware\n2024-03-02\n1\n99.00\n\n\n\nPros: dead-simple queries, no JOINs, easy for non-technical stakeholders.\nCons: massive storage footprint, duplicated data, painful to update (changing a product’s category means touching thousands of rows).\nOBT works best as a downstream export — something generated from a star schema for a specific use case — rather than a source of truth.\n\n\n\n\nWork through these questions in order:\n\nDo you need transaction integrity? → OLTP relational database.\nDo you need fast analytical aggregations on historical data? → Star schema / data warehouse.\nIs your data unstructured or variable-schema? → Document store (NoSQL).\nDo you need sub-millisecond lookups by a single key? → Key-value store.\nAre relationships between entities the primary concern? → Graph database.\nDo you need to store raw data cheaply at scale for future processing? → Data lake.\nDo you need a simple, flat export for a dashboard or downstream consumer? → OBT.\n\nReal architectures often combine several of these. A common pattern is: OLTP → raw events to a data lake → transformed into a star schema warehouse → a specific OBT exported for a dashboard.\n\n\n\n\nDatabase design is not about memorizing definitions — it is about understanding tradeoffs. Every paradigm discussed here exists because some team hit a real limitation with the previous approach and needed a better fit for their specific workload.\nHere is what to do next:\n\nSketch a schema for a dataset you already work with. Which paradigm does it currently use? Which would be better?\nSpin up a free tier of Snowflake or MongoDB Atlas and load a small dataset using the pattern described above.\nRead further — the Kimball Group’s dimensional modeling resources are the gold standard for star schema design and are freely available online.\n\nThe best database is the one that matches your workload. Now you have the vocabulary to make that call deliberately.\n\nHave a question or want to share what you built? Reach out via the contact page.",
     "crumbs": [
       "Tutorial: Database Types"
     ]
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Welcome to My Data Science Portfolio",
-    "section": "",
-    "text": "Welcome to my data science portfolio! This site shows my journey learning data science and analytics. Here you’ll find projects that demonstrate what I’ve learned and discovered.\n\n\nThis portfolio shows my work learning data science. Each project includes:\n\nMy code with documentation\nVisualizations I created\nWhat I learned and discovered\n\nI built this site using Quarto and host it on GitHub Pages.\n\n\n\n\nProgramming: Python, Pandas for data analysis\nVisualization: Creating charts with Matplotlib and Seaborn\nData Collection: Getting data from files, websites, and APIs\nAnalysis: Finding patterns and answering questions with data\n\n\n\n\n\n\n\nLearn how I explore datasets to find interesting patterns and answer questions.\n\n\n\nSee how I gather data from different sources and prepare it for analysis.\n\n\n\nSee how I tackle a data science project beginning to end.\n\n\n\nThanks for visiting! Feel free to explore my projects and see what I’m learning."
-  },
-  {
-    "objectID": "index.html#about-this-portfolio",
-    "href": "index.html#about-this-portfolio",
-    "title": "Welcome to My Data Science Portfolio",
-    "section": "",
-    "text": "This portfolio shows my work learning data science. Each project includes:\n\nMy code with documentation\nVisualizations I created\nWhat I learned and discovered\n\nI built this site using Quarto and host it on GitHub Pages."
-  },
-  {
-    "objectID": "index.html#skills-im-learning",
-    "href": "index.html#skills-im-learning",
-    "title": "Welcome to My Data Science Portfolio",
-    "section": "",
-    "text": "Programming: Python, Pandas for data analysis\nVisualization: Creating charts with Matplotlib and Seaborn\nData Collection: Getting data from files, websites, and APIs\nAnalysis: Finding patterns and answering questions with data"
-  },
-  {
-    "objectID": "index.html#my-projects",
-    "href": "index.html#my-projects",
-    "title": "Welcome to My Data Science Portfolio",
-    "section": "",
-    "text": "Learn how I explore datasets to find interesting patterns and answer questions.\n\n\n\nSee how I gather data from different sources and prepare it for analysis.\n\n\n\nSee how I tackle a data science project beginning to end.\n\n\n\nThanks for visiting! Feel free to explore my projects and see what I’m learning."
   },
   {
     "objectID": "projects/database-types.html#introduction-why-does-database-design-matter",
@@ -295,5 +147,83 @@
     "crumbs": [
       "Tutorial: Database Types"
     ]
+  },
+  {
+    "objectID": "projects/final-project.html",
+    "href": "projects/final-project.html",
+    "title": "Final Project",
+    "section": "",
+    "text": "This is coming down the pipeline. Check again later.",
+    "crumbs": [
+      "Final Project"
+    ]
+  },
+  {
+    "objectID": "projects/data-acquisition.html",
+    "href": "projects/data-acquisition.html",
+    "title": "Data Acquisition Project",
+    "section": "",
+    "text": "This is coming down the pipeline. Check again later.",
+    "crumbs": [
+      "Data Acquisition Project"
+    ]
+  },
+  {
+    "objectID": "projects/eda.html",
+    "href": "projects/eda.html",
+    "title": "EDA Project",
+    "section": "",
+    "text": "This is coming down the pipeline. Check again later.",
+    "crumbs": [
+      "EDA Project"
+    ]
+  },
+  {
+    "objectID": "projects/index.html",
+    "href": "projects/index.html",
+    "title": "Projects Overview",
+    "section": "",
+    "text": "Description: An overview of database types and when to use them.\n\n\n\nDescription: Pick a dataset and explore it to discover insights and answer questions.\n\n\n\nDescription: Find an interesting data source, collect the data, and prepare it for analysis.\n\n\n\nDescription: A comprehensive project that shows off my data science skills.",
+    "crumbs": [
+      "Projects Overview"
+    ]
+  },
+  {
+    "objectID": "projects/index.html#all-projects",
+    "href": "projects/index.html#all-projects",
+    "title": "Projects Overview",
+    "section": "",
+    "text": "Description: An overview of database types and when to use them.\n\n\n\nDescription: Pick a dataset and explore it to discover insights and answer questions.\n\n\n\nDescription: Find an interesting data source, collect the data, and prepare it for analysis.\n\n\n\nDescription: A comprehensive project that shows off my data science skills.",
+    "crumbs": [
+      "Projects Overview"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to My Data Science Portfolio",
+    "section": "",
+    "text": "Welcome to my data science portfolio! This site shows my journey learning data science and analytics. Here you’ll find projects that demonstrate what I’ve learned and discovered.\n\n\nThis portfolio shows my work learning data science. Each project includes:\n\nMy code with documentation\nVisualizations I created\nWhat I learned and discovered\n\nI built this site using Quarto and host it on GitHub Pages.\n\n\n\n\nProgramming: Python, Pandas for data analysis\nVisualization: Creating charts with Matplotlib and Seaborn\nData Collection: Getting data from files, websites, and APIs\nAnalysis: Finding patterns and answering questions with data\n\n\n\n\n\n\n\nLearn how I explore datasets to find interesting patterns and answer questions.\n\n\n\nSee how I gather data from different sources and prepare it for analysis.\n\n\n\nSee how I tackle a data science project beginning to end.\n\n\n\nThanks for visiting! Feel free to explore my projects and see what I’m learning."
+  },
+  {
+    "objectID": "index.html#about-this-portfolio",
+    "href": "index.html#about-this-portfolio",
+    "title": "Welcome to My Data Science Portfolio",
+    "section": "",
+    "text": "This portfolio shows my work learning data science. Each project includes:\n\nMy code with documentation\nVisualizations I created\nWhat I learned and discovered\n\nI built this site using Quarto and host it on GitHub Pages."
+  },
+  {
+    "objectID": "index.html#skills-im-learning",
+    "href": "index.html#skills-im-learning",
+    "title": "Welcome to My Data Science Portfolio",
+    "section": "",
+    "text": "Programming: Python, Pandas for data analysis\nVisualization: Creating charts with Matplotlib and Seaborn\nData Collection: Getting data from files, websites, and APIs\nAnalysis: Finding patterns and answering questions with data"
+  },
+  {
+    "objectID": "index.html#my-projects",
+    "href": "index.html#my-projects",
+    "title": "Welcome to My Data Science Portfolio",
+    "section": "",
+    "text": "Learn how I explore datasets to find interesting patterns and answer questions.\n\n\n\nSee how I gather data from different sources and prepare it for analysis.\n\n\n\nSee how I tackle a data science project beginning to end.\n\n\n\nThanks for visiting! Feel free to explore my projects and see what I’m learning."
   }
 ]
