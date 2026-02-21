@@ -1,0 +1,11 @@
+---
+title: "Tutorial: Database Types"
+author: "Your Name"
+date: "2025-01-01"
+format:
+  html:
+    code-fold: true
+    toc: true
+---
+
+This tutorial gives an overview of database types. Add your content here.

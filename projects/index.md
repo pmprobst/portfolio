@@ -4,6 +4,9 @@ title: "Projects Overview"
 
 ## All Projects
 
+### [Tutorial: Database Types](database-types.qmd)
+**Description**: An overview of database types and when to use them.
+
 ### [Exploratory Data Analysis Project](eda.qmd)
 **Description**: Pick a dataset and explore it to discover insights and answer questions.
 

@@ -20,6 +20,8 @@ website:
           - text: "All Projects"
             href: projects/index.md
           - text: "---"
+          - text: "Tutorial: Database Types"
+            href: projects/database-types.qmd
           - text: "Exploratory Data Analysis"
             href: projects/eda.qmd
           - text: "Data Acquisition"
@@ -36,6 +38,7 @@ website:
     - title: "Projects"
       contents:
         - projects/index.md
+        - projects/database-types.qmd
         - projects/eda.qmd
         - projects/data-acquisition.qmd
         - projects/final-project.qmd
