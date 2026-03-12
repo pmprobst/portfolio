@@ -1,11 +1,137 @@
 ---
 title: "Data Acquisition Project"
-author: "Your Name"
-date: "2025-01-01"
+author: "Paul Probst"
+date: "2026-03-11"
 format:
   html:
     code-fold: true
     toc: true
 ---
 
-This is coming down the pipeline. Check again later.
+# I Built a Tool to Stop Drowning in Facebook Marketplace Apartment Listings
+
+---
+
+## Introduction
+
+My housing contract ends in August. That means I've been doing what every college student in Provo eventually has to do: scrolling endlessly through Facebook Marketplace, clicking into listing after listing, trying to figure out if any of them are actually worth my time.
+
+The problem isn't that the listings aren't there. There are plenty. The problem is that the details that actually matter — beds, baths, whether utilities are included, what the lease term is — are buried in free-text descriptions. You have to click into every single post to find out. And half the time, the listing turns out to be female-only, require roommates, or only available for summer.
+
+So I built a scraper that does the clicking for me, pulls out the structured data, filters out listings I'm not interested in, and presents everything in a clean table I can actually scan.
+
+**[See the live table here](https://pmprobst.github.io/ApartmentListingScraper/)**
+
+---
+
+## The Motivating Question
+
+What apartments are currently listed on Facebook Marketplace in the Provo/Orem area that fit my budget and needs — priced under $1,200/month, available for fall/winter, and not requiring roommates or restricted to female tenants?
+
+---
+
+## Can You Even Scrape Facebook?
+
+Short answer: not directly. Facebook's Terms of Service explicitly prohibit unauthorized automated scraping, and their systems actively detect and block it via IP bans, CAPTCHAs, and account suspension.
+
+The solution I used is **[Bright Data](https://brightdata.com)**, a commercial data provider that has its own compliant infrastructure for accessing Marketplace listings. Rather than scraping Facebook myself, I make an API call to Bright Data and they return a clean JSON snapshot of listings matching my search parameters. At $1.50 per 1,000 records, the cost for a personal project running daily is manageable.
+
+I also built in good scraping practices beyond just legality: the pipeline runs once per day via GitHub Actions as to not hammer any API, and uses a single retry on timeouts rather than aggressive loops.
+
+---
+
+## How the Pipeline Works
+
+The full pipeline runs automatically every day across six stages:
+
+1. **Trigger snapshot** (`scripts/scrape.py`) — sends a request to Bright Data's API to queue a fresh snapshot of Provo/Orem Marketplace listings
+2. **Download snapshot** (`scripts/scrape_download.py`) — polls until the snapshot is ready, then downloads the raw JSON
+3. **Ingest** — parses and normalizes each raw record, upserts it into a SQLite database, and tracks whether each listing is new, updated, or a duplicate
+4. **Regex extraction** — runs pattern matching on listing descriptions to pull out structured fields
+5. **Claude extraction** — for listings where regex left gaps, the Claude API fills in the missing fields
+6. **Build page** — reads the filtered listings from SQLite and writes a static HTML table
+
+The snapshot is triggered at 9am UTC; the rest of the pipeline runs at 10am UTC, giving Bright Data an hour to prepare the data.
+
+To keep sensitive data private, the pipeline uses two repos: the [public repo](https://github.com/pmprobst/ApartmentListingScraper) holds the code and the published HTML site, while a private repo holds the raw snapshot JSON and `listings.db`.
+
+![GitHub Actions workflows tab showing 'Trigger Snapshot' and 'Run Pipeline' jobs](../images/GithubActionsScreenshot.png){width=95%}
+
+![Pipeline flowchart — Bright Data API → Raw JSON → SQLite → Regex + Claude extraction → Static HTML](../images/DataPipelineDiagram.png){width=95%}
+
+---
+
+## The Interesting Part: Extracting Structure from Messy Listing Text
+
+Listing descriptions are written by humans in a hurry. A typical description might say something like *"Men's private room. 3 roommates staying. Utilities usually about $80. Available April through August with option to renew."* From that, I need to reliably extract eight fields: bedrooms, bathrooms, in-unit washer/dryer, roommates, gender preference, utilities included, utility cost, and lease length.
+
+I use a **two-stage hybrid approach**.
+
+**Stage 1 — Regex** runs first on the combined title and description. The text is normalized first (emoji stripped, whitespace collapsed, common typos like `"utilites"` corrected), then a battery of pre-compiled patterns fires:
+
+- Beds and baths: handles `"2 bed"`, `"2BR"`, `"2bd"`, `"3x2"`, `"studio"`, and more
+- Washer/dryer: separate pattern lists for in-unit vs. shared laundry — in-unit is checked first so `"washer and dryer provided"` doesn't accidentally match as shared
+- Utilities: three tiers — "all included" phrases, specific utility keywords (`"water included"`), and cost patterns (`"utilities about $80/mo"`)
+- Lease length: matches named seasons, academic-year terms, and date ranges; a summer lease that also mentions `"option to renew"` is automatically upgraded to `"summer w/ option to review"`
+- Roommates: patterns for joining a shared apartment (`"selling my spot"`, `"subleasing my contract"`, `"3 roommates staying"`) and whole-unit language (`"no roommates"`, `"whole place to yourself"`); a `"private room"` listing without solo-unit language is also inferred as having roommates
+- Price-based fallback: if roommate status is still unclear and the listing is 2+ beds under $600/month, it's inferred as `has_roommates = True`
+
+Each field is marked as confident or not. If any field remains uncertain, the row is queued as `pending` for Stage 2.
+
+**Stage 2 — Claude API** handles the listings regex couldn't fully resolve. The system prompt gives Claude context about the Provo/Orem student housing market, including that many listings are BYU/UVU contract sales where a current tenant is selling their spot. The regex pre-fills are passed as **ground truth** — Claude is told not to re-derive them, only to fill in the missing fields. Lease length is constrained to exactly three allowed strings (`"summer"`, `"summer w/ option to review"`, `"fall/winter"`), so Claude can't hallucinate an unusual format. Listings are processed in batches to minimize API calls.
+
+> *[Screenshot: A real listing description with a side-by-side table showing Stage 1 regex output (with missing fields flagged) vs. final DB values after Claude]*
+
+![Diagram: Extraction funnel — all listings with descriptions → Stage 1 Regex → "Done (confident)" or "Pending" → Stage 2 Claude → "Done"](../images/ExtractionPipelineDiagram.png){width = 95%}
+
+---
+
+## Dataset Overview
+
+The database currently holds **815 listings** accumulated over time. After applying the 30-day recency window, $0–$1,200 price filter, and exclusions for female-only, roommate-required, and summer-only leases, **212 listings** are displayed in the current table.
+
+The most recent pipeline run scraped 101 listings: 52 were new, 48 were updates to existing listings, 1 was thrown out, and 44 were processed by Claude.
+
+**The nine columns displayed in the table:**
+
+| Column | Description |
+|---|---|
+| Title | Listing title, linked to the original Facebook post |
+| Price | Monthly rent (USD) |
+| Beds | Number of bedrooms |
+| Baths | Number of bathrooms |
+| Listing date | Date originally posted |
+| In-unit W/D | In-unit washer/dryer availability |
+| Utilities | Which utilities are included in rent |
+| Util cost | Estimated monthly cost of non-included utilities |
+| Lease | Lease type (fall/winter, summer, etc.) |
+
+**Extraction coverage varies quite a bit by field:**
+
+> *[Bar chart: missingness by field — gender preference 86%, has roommates 71%, beds/baths ~62%, in-unit W/D 41%, lease 40%, util cost 29%, utilities included 19%]*
+
+The low coverage on `utilities_included` (19%) isn't really an extraction failure — most listings just don't mention utilities. Fields like gender preference and roommate status are well-covered because landlords in the BYU/UVU market tend to specify them prominently.
+
+**Notable data quality considerations:**
+- Listings without descriptions (14% of the dataset) can't be extraction-processed and will show mostly null fields
+- The 30-day rolling window means the table reflects current availability, not historical trends
+- Only Facebook Marketplace is covered; KSL, Zillow, and other platforms are not included
+
+> *[Screenshot: Live HTML table showing several filtered listings with all 9 columns populated]*
+
+> *[Diagram: SQLite schema showing listings and run_status tables, annotated by which pipeline stage populates each field]*
+
+---
+
+## Conclusion
+
+Want to build something similar? The full code is on GitHub: **[github.com/pmprobst/ApartmentListingScraper](https://github.com/pmprobst/ApartmentListingScraper)**
+
+To replicate this for another city or platform, you'd need:
+- A **[Bright Data](https://brightdata.com)** account and dataset ID (pricing: $1.50/1k records)
+- An **[Anthropic API key](https://www.anthropic.com)** for the Claude extraction step
+- GitHub Actions secrets for both keys and a private repo for your database
+- Updates to `config.toml` to point at your target city, price range, and category
+
+Additional resources: [SQLite documentation](https://www.sqlite.org/docs.html) · [GitHub Actions documentation](https://docs.github.com/en/actions)
+
