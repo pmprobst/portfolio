@@ -413,7 +413,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Bar chart: missingness by field</figcaption>
 </figure>
 </div>
-<p>The low coverage on <code>utilities_included</code> (19%) isn’t really an extraction failure. Most listings just don’t mention utilities. Fields like gender preference and roommate status are well-covered because landlords in the BYU/UVU market tend to note them in the listings often.</p>
+<ul>
+<li>The low coverage on <code>utilities_included</code> (19%) isn’t really an extraction failure. Most listings just don’t mention utilities. Fields like gender preference and roommate status are well-covered because landlords in the BYU/UVU market tend to note them in the listings often.</li>
+<li>Prices cluster in the $480–$900/month range, with a median of $595. The distribution has a long right tail — a handful of listings go up to $2,850 — and at least one suspicious $10 listing suggesting data entry errors or scams.</li>
+<li>The market is overwhelmingly summer-focused. Of the 320 listings with an extracted lease length, 85% are summer or summer-with-renewal. Fall/winter leases make up only 8%, which is why so few listings pass the filter for the displayed table.</li>
+<li>Most listings involve roommates (83% of those with the field extracted). Only 96 listings advertise a private/no-roommate situation.</li>
+<li>Gender restrictions are common: 20% of listings are female-only and 11% are male-only, meaning a fifth of all listings are off the table for me before price or availability are even considered.</li>
+<li>In-unit washer/dryer coverage is split nearly 50/50 among listings that mention it (181 yes vs.&nbsp;153 no), but the field is only populated for ~41% of listings — so the true share is unknown for the majority.</li>
+</ul>
 <p><strong>Notable data quality considerations:</strong> - Listings without descriptions (14% of the dataset) can’t be extraction-processed and will show mostly null fields - The 30-day rolling window means the table reflects current availability - Only Facebook Marketplace is covered; KSL, Zillow, and other platforms are not included</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -990,28 +997,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a><span class="al">![Bar chart: missingness by field](../images/FieldCompletenessDiagram.png)</span></span>
 <span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>The low coverage on <span class="in">`utilities_included`</span> (19%) isn't really an extraction failure. Most listings just don't mention utilities. Fields like gender preference and roommate status are well-covered because landlords in the BYU/UVU market tend to note them in the listings often.</span>
-<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>**Notable data quality considerations:**</span>
-<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Listings without descriptions (14% of the dataset) can't be extraction-processed and will show mostly null fields</span>
-<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The 30-day rolling window means the table reflects current availability</span>
-<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Only Facebook Marketplace is covered; KSL, Zillow, and other platforms are not included</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The low coverage on <span class="in">`utilities_included`</span> (19%) isn't really an extraction failure. Most listings just don't mention utilities. Fields like gender preference and roommate status are well-covered because landlords in the BYU/UVU market tend to note them in the listings often.</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Prices cluster in the $480–$900/month range, with a median of $595. The distribution has a long right tail — a handful of listings go up to $2,850 — and at least one suspicious $10 listing suggesting data entry errors or scams.</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The market is overwhelmingly summer-focused. Of the 320 listings with an extracted lease length, 85% are summer or summer-with-renewal. Fall/winter leases make up only 8%, which is why so few listings pass the filter for the displayed table.</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Most listings involve roommates (83% of those with the field extracted). Only 96 listings advertise a private/no-roommate situation.</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Gender restrictions are common: 20% of listings are female-only and 11% are male-only, meaning a fifth of all listings are off the table for me before price or availability are even considered.</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>In-unit washer/dryer coverage is split nearly 50/50 among listings that mention it (181 yes vs. 153 no), but the field is only populated for ~41% of listings — so the true share is unknown for the majority.</span>
 <span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a><span class="al">![SQLite schema showing listings and run_status tables, annotated by which pipeline stage populates each field](../images/SQLiteSchema.png)</span>{width=95%}</span>
-<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conclusion</span></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>**Notable data quality considerations:**</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Listings without descriptions (14% of the dataset) can't be extraction-processed and will show mostly null fields</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The 30-day rolling window means the table reflects current availability</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Only Facebook Marketplace is covered; KSL, Zillow, and other platforms are not included</span>
 <span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>Want to build something similar? The full code is on GitHub: **[github.com/pmprobst/ApartmentListingScraper](https://github.com/pmprobst/ApartmentListingScraper)**</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a><span class="al">![SQLite schema showing listings and run_status tables, annotated by which pipeline stage populates each field](../images/SQLiteSchema.png)</span>{width=95%}</span>
 <span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>To replicate this for another city or platform, you'd need:</span>
-<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A **[Bright Data](https://brightdata.com)** account (pricing: $1.50/1k records)</span>
-<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>An **[Anthropic API key](https://www.anthropic.com)** for the Claude extraction step</span>
-<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>GitHub Actions secrets for both keys and a private repo for your database</span>
-<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Updates to <span class="in">`config.toml`</span> to point at your target city, price range, and category</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conclusion</span></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>Want to build something similar? The full code is on GitHub: **[github.com/pmprobst/ApartmentListingScraper](https://github.com/pmprobst/ApartmentListingScraper)**</span>
 <span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>Additional resources: <span class="co">[</span><span class="ot">SQLite documentation</span><span class="co">](https://www.sqlite.org/docs.html)</span> · <span class="co">[</span><span class="ot">GitHub Actions documentation</span><span class="co">](https://docs.github.com/en/actions)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>To replicate this for another city or platform, you'd need:</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A **[Bright Data](https://brightdata.com)** account (pricing: $1.50/1k records)</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>An **[Anthropic API key](https://www.anthropic.com)** for the Claude extraction step</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>GitHub Actions secrets for both keys and a private repo for your database</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Updates to <span class="in">`config.toml`</span> to point at your target city, price range, and category</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>Additional resources: <span class="co">[</span><span class="ot">SQLite documentation</span><span class="co">](https://www.sqlite.org/docs.html)</span> · <span class="co">[</span><span class="ot">GitHub Actions documentation</span><span class="co">](https://docs.github.com/en/actions)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

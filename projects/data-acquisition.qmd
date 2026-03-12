@@ -101,7 +101,13 @@ The most recent pipeline run scraped 101 listings: 52 were new, 48 were updates 
 
 ![Bar chart: missingness by field](../images/FieldCompletenessDiagram.png)
 
-The low coverage on `utilities_included` (19%) isn't really an extraction failure. Most listings just don't mention utilities. Fields like gender preference and roommate status are well-covered because landlords in the BYU/UVU market tend to note them in the listings often.
+- The low coverage on `utilities_included` (19%) isn't really an extraction failure. Most listings just don't mention utilities. Fields like gender preference and roommate status are well-covered because landlords in the BYU/UVU market tend to note them in the listings often.
+- Prices cluster in the $480–$900/month range, with a median of $595. The distribution has a long right tail — a handful of listings go up to $2,850 — and at least one suspicious $10 listing suggesting data entry errors or scams.
+- The market is overwhelmingly summer-focused. Of the 320 listings with an extracted lease length, 85% are summer or summer-with-renewal. Fall/winter leases make up only 8%, which is why so few listings pass the filter for the displayed table.
+- Most listings involve roommates (83% of those with the field extracted). Only 96 listings advertise a private/no-roommate situation.
+- Gender restrictions are common: 20% of listings are female-only and 11% are male-only, meaning a fifth of all listings are off the table for me before price or availability are even considered.
+- In-unit washer/dryer coverage is split nearly 50/50 among listings that mention it (181 yes vs. 153 no), but the field is only populated for ~41% of listings — so the true share is unknown for the majority.
+
 
 **Notable data quality considerations:**
 - Listings without descriptions (14% of the dataset) can't be extraction-processed and will show mostly null fields
